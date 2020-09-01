@@ -21,9 +21,11 @@ const containerHeight = 500
   const uploadInput = document.createElement('input')
   uploadInput.type = 'file'
   document.body.append(uploadInput)
-  uploadInput.addEventListener('change', (e: any) => {
+  uploadInput.addEventListener('change', async (e: any) => {
     const file: File = e.target.files.item(0)
-    postWorkerMessage('zipReady', { file })
+    if (!file) { return }
+    const arrayBuffer = await file.arrayBuffer()
+    postWorkerMessage('zipReady', { file: arrayBuffer })
   })
 
   function initScene() {
@@ -58,7 +60,7 @@ const containerHeight = 500
 
     // 使用一个messageChannel，将port2传给serviceWorker进行通信
     const messageChannel = new MessageChannel()
-    worker.postMessage({ type: 'initMessageChannel', data: { messageChannelPort: messageChannel.port2 }}, [messageChannel.port2])
+    postWorkerMessage.call(worker, 'initMessageChannel', { messageChannelPort: messageChannel.port2 })
 
     messageChannel.port1.onmessage = e => {
       const bindMsgHandler = <T extends keyof ChannelMassageMaps>(type: T, handler: (data: ChannelMassageMaps[T]) => void) => 
@@ -99,8 +101,9 @@ const containerHeight = 500
     )
   }
 
-  function postWorkerMessage<T extends keyof WorkerMessageMaps>(type: T, data: WorkerMessageMaps[T]) {
-    worker.postMessage({ type, data })
+  function postWorkerMessage<T extends keyof WorkerMessageMaps>(this: ServiceWorker | void, type: T, data: WorkerMessageMaps[T]) {
+    const transferList = Object.values(data).filter(item => [ArrayBuffer, MessagePort, ImageBitmap].includes(item.constructor))
+    ;(this || worker).postMessage({ type, data }, transferList)
   }
 })()
 
