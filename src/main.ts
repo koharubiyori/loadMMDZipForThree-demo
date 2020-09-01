@@ -66,7 +66,7 @@ const containerHeight = 500
   async function initWorker() {
     // 开启一个serviceWorker，将zip传入，解压并作为数据源，拦截请求
     // 因为MMDLoader根据pmx的材质名自动向同路径下发请求，其他办法均无法做到一个文件加载mmd模型
-    const serviceWorkerRegistration = await navigator.serviceWorker.register(window.__mmdPreviewerWorkerPath || '/worker.js')
+    const serviceWorkerRegistration = await navigator.serviceWorker.register(window.__mmdPreviewerWorkerPath || 'worker.js')
     await navigator.serviceWorker.ready
 
     // serviceWorker首次安装后不会生效，这里强制刷新一次
