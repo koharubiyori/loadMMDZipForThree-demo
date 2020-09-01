@@ -45,7 +45,7 @@ const containerHeight = 500
       postWorkerMessage('zipReady', { file: xhr.response })
     }
     xhr.onprogress = e => {
-      kizunaLoadingProgress.textContent = Math.floor(e.loaded / e.total) * 100 + '%'
+      kizunaLoadingProgress.textContent = Math.floor(e.loaded / e.total * 100) + '%'
     }
   })
 
