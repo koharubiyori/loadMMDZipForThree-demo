@@ -2,8 +2,7 @@
   "presets": [
     ["@babel/preset-env", {
       "useBuiltIns": "usage", // 根据调用自动添加polyfill
-      "corejs": 3,  // 指定corejs的版本，@babel/polyfill从7.4后已经弃用
-      "ignoreBrowserslistConfig": true  // 使用.browserlistrc的配置
+      "corejs": 3  // 指定corejs的版本，@babel/polyfill从7.4后已经弃用
     }],  // 包含一系列常用预设
     
     // 取代ts-loader，将流程从 ts -> ts-loader -> js -> babel -> js 转为 ts -> babel -> js

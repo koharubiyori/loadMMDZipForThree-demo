@@ -28,6 +28,19 @@ const containerHeight = 500
     postWorkerMessage('zipReady', { file: arrayBuffer })
   })
 
+  const buttonToLoadKizunaAi = document.createElement('button')
+  buttonToLoadKizunaAi.textContent = '加载老大(可能有点慢)'
+  document.body.append(buttonToLoadKizunaAi)
+  buttonToLoadKizunaAi.addEventListener('click', () => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('get', 'kizunaai.zip')
+    xhr.responseType = 'arraybuffer'
+    xhr.send()
+    xhr.onload = () => {
+      postWorkerMessage('zipReady', { file: xhr.response })
+    }
+  })
+
   function initScene() {
     // 创建场景
     const scene = new THREE.Scene()
@@ -56,6 +69,11 @@ const containerHeight = 500
     const serviceWorkerRegistration = await navigator.serviceWorker.register(window.__mmdPreviewerWorkerPath || '/worker.js')
     await navigator.serviceWorker.ready
 
+    // serviceWorker首次安装后不会生效，这里强制刷新一次
+    if (localStorage.getItem('mmdPreviewer-workerReady')) {
+      localStorage.setItem('mmdPreviewer-workerReady', 'true')
+      location.reload()
+    }
     const worker = serviceWorkerRegistration.active!
 
     // 使用一个messageChannel，将port2传给serviceWorker进行通信
@@ -93,8 +111,8 @@ const containerHeight = 500
         const controls = new OrbitControls(camera, renderer.domElement)
         controls.addEventListener('change', render)
         
-        ;(function animateLoop() {
-          requestAnimationFrame(animateLoop)
+        ;(function animationLoop() {
+          requestAnimationFrame(animationLoop)
           render()
         })()
       }

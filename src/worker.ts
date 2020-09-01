@@ -11,10 +11,6 @@ export interface WorkerMessageMaps {
   }
 }
 
-// interface MMDData {
-//   [filePath: string]: Blob
-// }
-
 ;(() => {
   let messageChannelPort: MessagePort = null as any  // 用于回传数据的prot
   let mmdData: JSZip | null = null  // 最终解压处理好的mmd数据
@@ -53,17 +49,8 @@ export interface WorkerMessageMaps {
     // 接收mmd zip
     bindMsgHandler('zipReady', async data => {
       console.log(data)
-      mmdData = await unzip(data.file as ArrayBuffer)
-      
-      // // 提前全部转为blob
-      // const mmdBlobs: any = {}
-      // await Promise.all(
-      //   Object.keys(unzippedData.files).map(async key => {
-      //     mmdBlobs[key] = (await unzippedData.files[key].async('blob')) as any
-      //   })
-      // )
-      
-      // mmdData = mmdBlobs
+      mmdData = await unzip(data.file as any)
+    
       const pmxFileName = Object.keys(mmdData.files).find(item => /\.pmx$/.test(item))!
       // mmd数据准备完毕，通知主线程
       postChannelMessage('mmdDataReady', { pmxFileName })
