@@ -29,15 +29,23 @@ const containerHeight = 500
   })
 
   const buttonToLoadKizunaAi = document.createElement('button')
+  const kizunaLoadingProgress = document.createElement('span')
   buttonToLoadKizunaAi.textContent = '加载老大(可能有点慢)'
+  
   document.body.append(buttonToLoadKizunaAi)
+  document.body.append(kizunaLoadingProgress)
+
   buttonToLoadKizunaAi.addEventListener('click', () => {
+    buttonToLoadKizunaAi.disabled = true
     const xhr = new XMLHttpRequest()
     xhr.open('get', 'kizunaai.zip')
     xhr.responseType = 'arraybuffer'
     xhr.send()
     xhr.onload = () => {
       postWorkerMessage('zipReady', { file: xhr.response })
+    }
+    xhr.onprogress = e => {
+      kizunaLoadingProgress.textContent = Math.floor(e.loaded / e.total) * 100 + '%'
     }
   })
 
