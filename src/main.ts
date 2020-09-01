@@ -70,7 +70,7 @@ const containerHeight = 500
     await navigator.serviceWorker.ready
 
     // serviceWorker首次安装后不会生效，这里强制刷新一次
-    if (localStorage.getItem('mmdPreviewer-workerReady')) {
+    if (!localStorage.getItem('mmdPreviewer-workerReady')) {
       localStorage.setItem('mmdPreviewer-workerReady', 'true')
       location.reload()
     }
