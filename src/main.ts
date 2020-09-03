@@ -18,6 +18,21 @@ const containerHeight = 500
   const { scene, camera, renderer } = initScene()
   const worker = await initWorker()
 
+  // 使用一个messageChannel，将port2传给serviceWorker进行通信
+  const messageChannel = new MessageChannel()
+  postWorkerMessage.call(worker, 'initMessageChannel', { messageChannelPort: messageChannel.port2 })
+
+  messageChannel.port1.onmessage = e => {
+    const bindMsgHandler = <T extends keyof ChannelMassageMaps>(type: T, handler: (data: ChannelMassageMaps[T]) => void) => 
+      e.data.type === type && handler(e.data.data)
+
+    bindMsgHandler('mmdDataReady', data => {
+      // 以这个常量开头的请求会被拦截并去匹配zip包中的数据
+      initMMD(`/${SIMULATED_MMD_RESOURCE_FOLDER_FLAG}/${data.pmxFileName}`)
+    })
+  }
+
+
   const uploadInput = document.createElement('input')
   uploadInput.type = 'file'
   document.body.append(uploadInput)
@@ -83,21 +98,6 @@ const containerHeight = 500
       location.reload()
     }
     const worker = serviceWorkerRegistration.active!
-
-    // 使用一个messageChannel，将port2传给serviceWorker进行通信
-    const messageChannel = new MessageChannel()
-    postWorkerMessage.call(worker, 'initMessageChannel', { messageChannelPort: messageChannel.port2 })
-
-    messageChannel.port1.onmessage = e => {
-      const bindMsgHandler = <T extends keyof ChannelMassageMaps>(type: T, handler: (data: ChannelMassageMaps[T]) => void) => 
-        e.data.type === type && handler(e.data.data)
-
-      bindMsgHandler('mmdDataReady', data => {
-        // 以这个常量开头的请求会被拦截并去匹配zip包中的数据
-        initMMD(`/${SIMULATED_MMD_RESOURCE_FOLDER_FLAG}/${data.pmxFileName}`)
-      })
-    }
-
     return worker
   }
 
