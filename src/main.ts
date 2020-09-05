@@ -28,7 +28,7 @@ const containerHeight = 500
 
     bindMsgHandler('mmdDataReady', data => {
       // 以这个常量开头的请求会被拦截并去匹配zip包中的数据
-      initMMD(`/${SIMULATED_MMD_RESOURCE_FOLDER_FLAG}/${data.pmxFileName}`)
+      initMmd(`/${SIMULATED_MMD_RESOURCE_FOLDER_FLAG}/${data.pmxFileName}`)
     })
   }
 
@@ -89,7 +89,7 @@ const containerHeight = 500
   async function initWorker() {
     // 开启一个serviceWorker，将zip传入，解压并作为数据源，拦截请求
     // 因为MMDLoader根据pmx的材质名自动向同路径下发请求，其他办法均无法做到一个文件加载mmd模型
-    const serviceWorkerRegistration = await navigator.serviceWorker.register(window.__mmdPreviewerWorkerPath || 'worker.js')
+    const serviceWorkerRegistration = await navigator.serviceWorker.register('worker.js')
     await navigator.serviceWorker.ready
 
     // serviceWorker首次安装后不会生效，这里强制刷新一次
@@ -101,7 +101,7 @@ const containerHeight = 500
     return worker
   }
 
-  function initMMD(pmxPath: string) {
+  function initMmd(pmxPath: string) {
     const loader = new MMDLoader()
     loader.load(
       pmxPath, 
